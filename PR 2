@@ -1,0 +1,62 @@
+# include <cmath>
+# include <iostream>
+
+using namespace std;
+
+int main() {
+    setlocale(LC_ALL, "Rus");
+
+    char q;
+    float n1, n2;
+
+    cout << "Выберите знак: 1-Сложение \n 2-Вычитание\n 3-Умножение\n 4-Деление\n 5-1 процент от числа\n 6-Возведение в степень\n 7-Корень\n 9-Выход : ";
+    cin >> q;
+    cout << "Введите числа через пробел: ";
+    cin >> n1 >> n2;
+
+    switch (q) {
+
+    case '1':
+        cout << n1 << " + " << n2 << " = " << n1 + n2;
+        break;
+
+    case '2':
+        cout << n1 << " - " << n2 << " = " << n1 - n2;
+        break;
+
+    case '3':
+        cout << n1 << " * " << n2 << " = " << n1 * n2;
+        break;
+
+    case '4':
+        cout << n1 << " / " << n2 << " = " << n1 / n2;
+        break;
+   
+    case '5':
+        cout << "Процент от числа " << n1 << " = " << n1 * 0.01;
+        break;
+    
+    case '6':
+        cout << n1 << " ^ " << n2 << " = " << pow(n1, n2);
+        break;
+
+    case '7':
+        cout << "Квадратный корень из " << n1 << " = " << sqrt(n1);
+        break;
+
+    //case '8':
+     //   cout << "Факториал числа  " << n1 << " это "
+       //     << factorial(n1) << endl;
+        //break;
+
+
+    case '9':
+        return 0;
+
+    default:
+        cout << "Ошибка";
+        break;
+    }
+
+    return 0;
+}
