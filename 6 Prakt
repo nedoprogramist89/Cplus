@@ -1,0 +1,219 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <exception>
+
+class Student {
+private:
+    std::string group;
+    std::vector<std::string> disciplines;
+    int completedWorks;
+    int debts;
+
+public:
+    Student(const std::string& group) {
+        if (group.empty()) {
+            throw std::invalid_argument("Оно не может быть пустым");
+        }
+        this->group = group;
+        completedWorks = 0;
+        debts = 0;
+    }
+
+    void addDiscipline(const std::string& discipline) {
+        if (discipline.empty()) {
+            throw std::invalid_argument("оно не может быть пустым");
+        }
+        disciplines.push_back(discipline);
+    }
+
+    void addCompletedWork() {
+        completedWorks++;
+    }
+
+    void addDebt() {
+        debts++;
+        if (debts > 5) {
+            std::cout << "Студент имеет слишком много долгов!" << std::endl;
+        }
+    }
+
+    int getDebts() const {
+        return debts;
+    }
+
+    const std::string& getGroup() const {
+        return group;
+    }
+
+    int getCompletedWorks() const {
+        return completedWorks;
+    }
+};
+
+class Teacher {
+private:
+    std::string discipline;
+    std::vector<std::string> groups;
+
+public:
+    Teacher(const std::string& discipline) {
+        if (discipline.empty()) {
+            throw std::invalid_argument("Оно не может быть пустым");
+        }
+        this->discipline = discipline;
+    }
+
+    void addGroup(const std::string& group) {
+        if (group.empty()) {
+            throw std::invalid_argument("Оно не может быть пустым");
+        }
+        groups.push_back(group);
+    }
+
+    const std::string& getDiscipline() const {
+        return discipline;
+    }
+
+    const std::vector<std::string>& getGroups() const {
+        return groups;
+    }
+};
+
+class MoscowTech {
+private:
+    std::vector<Student> students;
+    std::vector<Teacher> teachers;
+
+public:
+    void addStudent(const Student& student) {
+        students.push_back(student);
+    }
+
+    void addTeacher(const Teacher& teacher) {
+        teachers.push_back(teacher);
+    }
+
+    void assignWork(int studentIndex) {
+        if (studentIndex < 0 || studentIndex >= students.size()) {
+            std::cout << "Некорректный номер студента!" << std::endl;
+            return;
+        }
+        students[studentIndex].addCompletedWork();
+        std::cout << "Задание добавлено студенту с индексом " << studentIndex << std::endl;
+    }
+
+    void submitWork(int studentIndex) {
+        if (studentIndex < 0 || studentIndex >= students.size()) {
+            std::cout << "Некорректный номер студента!" << std::endl;
+            return;
+        }
+        students[studentIndex].addDebt();
+        std::cout << "Работа сдана студенту с индексом " << studentIndex << std::endl;
+        if (students[studentIndex].getDebts() > 5) {
+            students.erase(students.begin() + studentIndex);
+            std::cout << "Студент удален из группы из-за большого количества долгов." << std::endl;
+        }
+    }
+
+    void displayCurrentState() {
+        std::cout << "Студенты в группах:" << std::endl;
+        for (int i = 0; i < students.size(); ++i) {
+            std::cout << "Индекс: " << i << ", Группа: " << students[i].getGroup() << ", Сданных работ: " << students[i].getCompletedWorks() << ", Долгов: " << students[i].getDebts() << std::endl;
+        }
+
+        std::cout << "Преподаватели и дисциплины:" << std::endl;
+        for (const auto& teacher : teachers) {
+            std::cout << "Преподаватель по дисциплине " << teacher.getDiscipline() << " в группах: ";
+            for (const auto& group : teacher.getGroups()) {
+                std::cout << group << " ";
+            }
+            std::cout << std::endl;
+        }
+    }
+
+    int countStudentsInClass() {
+        return students.size();
+    }
+};
+
+int main() {
+    setlocale(LC_ALL, "Rus");
+
+    MoscowTech mpt;
+    bool running = true;
+
+    while (running) {
+        std::cout << "Меню:" << std::endl;
+        std::cout << "1. Добавить студента" << std::endl;
+        std::cout << "2. Добавить преподавателя" << std::endl;
+        std::cout << "3. Выдать задание студенту" << std::endl;
+        std::cout << "4. Сдать работу студента" << std::endl;
+        std::cout << "5. Показать текущее состояние" << std::endl;
+        std::cout << "6. Выйти из программы" << std::endl;
+        std::cout << "Выберите действие: ";
+
+        int choice;
+        std::cin >> choice;
+
+        switch (choice) {
+        case 1: {
+            std::string group;
+            std::cout << "Введите группу студента: ";
+            std::cin >> group;
+            try {
+                Student student(group);
+                mpt.addStudent(student);
+                std::cout << "Студент успешно добавлен." << std::endl;
+            }
+            catch (const std::invalid_argument& e) {
+                std::cerr << e.what() << std::endl;
+            }
+            break;
+        }
+        case 2: {
+            std::string discipline;
+            std::cout << "Введите дисциплину преподавателя: ";
+            std::cin >> discipline;
+            try {
+                Teacher teacher(discipline);
+                mpt.addTeacher(teacher);
+                std::cout << "Преподаватель успешно добавлен." << std::endl;
+            }
+            catch (const std::invalid_argument& e) {
+                std::cerr << e.what() << std::endl;
+            }
+            break;
+        }
+        case 3: {
+            int studentIndex;
+            std::cout << "Введите индекс студента: ";
+            std::cin >> studentIndex;
+            mpt.assignWork(studentIndex);
+            break;
+        }
+        case 4: {
+            int studentIndex;
+            std::cout << "Введите индекс студента: ";
+            std::cin >> studentIndex;
+            mpt.submitWork(studentIndex);
+            break;
+        }
+        case 5: {
+            mpt.displayCurrentState();
+            break;
+        }
+        case 6: {
+            running = false;
+            std::cout << "Выход из программы." << std::endl;
+            break;
+        }
+        default:
+            std::cout << "Некорректный выбор. Пожалуйста, выберите действие из меню." << std::endl;
+        }
+    }
+
+    return 0;
+}
+
